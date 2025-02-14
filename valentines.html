@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Valentine's Question ❤️</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(45deg, #ff99cc, #ff6699);
+      font-family: 'Pacifico', cursive;
+      overflow: hidden;
+    }
+    .message {
+      font-size: 2.5em;
+      color: #fff;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    .buttons {
+      position: relative;
+      z-index: 1;
+    }
+    button {
+      position: relative;
+      padding: 15px 30px;
+      margin: 10px;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    button:hover {
+      box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+    }
+    button.clicked {
+      transform: scale(0.95);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    #yesButton {
+      background-color: #4CAF50;
+      color: white;
+      transform: scale(1);
+      transition: transform 0.2s ease;
+    }
+    #noButton {
+      background-color: #f44336;
+      color: white;
+      position: absolute;
+    }
+    #response {
+      display: none;
+      font-size: 2em;
+      color: white;
+      text-align: center;
+      margin-top: 20px;
+    }
+    /* Ripple effect style */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      transform: scale(0);
+      background: rgba(255,255,255,0.7);
+      animation: ripple-effect 600ms linear;
+      pointer-events: none;
+    }
+    @keyframes ripple-effect {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+    /* Romantic hearts animation */
+    .romantic-heart {
+      position: absolute;
+      font-size: 2em;
+      pointer-events: none;
+      animation: heartRise 3s ease-out forwards;
+    }
+    @keyframes heartRise {
+      0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-200px) scale(1.5);
+      }
+    }
+    /* Heart balloon animations (unchanged) */
+    .heart-balloon {
+      position: absolute;
+      animation: move 8s infinite linear, heartbeat 1.5s infinite;
+    }
+    .heart-balloon::before,
+    .heart-balloon::after {
+      content: '';
+      position: absolute;
+      width: 30px;
+      height: 48px;
+      background: #ff4081;
+      border-radius: 30px 30px 0 0;
+      transform: rotate(-45deg);
+      transform-origin: 0 100%;
+    }
+    .heart-balloon::after {
+      left: 30px;
+      transform: rotate(45deg);
+      transform-origin: 100% 100%;
+    }
+    @keyframes move {
+      0% { transform: translate(0, 0); }
+      25% { transform: translate(100px, 100px); }
+      50% { transform: translate(200px, -50px); }
+      75% { transform: translate(-100px, 150px); }
+      100% { transform: translate(0, 0); }
+    }
+    @keyframes heartbeat {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <div class="heart-balloon" style="top: 20%; left: 10%;"></div>
+  <div class="heart-balloon" style="top: 60%; left: 80%;"></div>
+  <div class="heart-balloon" style="top: 30%; left: 70%;"></div>
+
+  <h1 class="message">Will you be my Valentine? 💖</h1>
+  
+  <div class="buttons">
+    <button id="yesButton" onclick="showResponse(event)">Yes! 😍</button>
+    <button id="noButton" onclick="moveButton(event)">No 😢</button>
+  </div>
+
+  <div id="response">
+    I knew you'd say yes!<br>Let's get going 💑
+  </div>
+
+  <script>
+    let yesScale = 1;
+    const messages = [
+      "Whyyy?", "Try again!", "Nope!", "Not today!", "Oops!", "Too slow!", "Missed me!",
+      "Nah!", "Not happening!", "Think again!", "Nice try!", "Almost!", "Keep trying!",
+      "Nuh-uh!", "Nada!", "Nope, nope!", "Try harder!", "Not this time!", "Haha, no!",
+      "You wish!", "Not a chance!", "Maybe later!", "Nope, sorry!", "Not gonna happen!",
+      "Try clicking faster!", "Nope, try again!", "You can't catch me!", "Nope, nope, nope!"
+    ];
+    const noButton = document.getElementById('noButton');
+
+    function createRipple(e, button) {
+      const ripple = document.createElement("span");
+      ripple.className = "ripple";
+      const rect = button.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      ripple.style.width = ripple.style.height = size + "px";
+      const x = e.clientX - rect.left - size / 2;
+      const y = e.clientY - rect.top - size / 2;
+      ripple.style.left = x + "px";
+      ripple.style.top = y + "px";
+      button.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
+    }
+
+    function showEmoji(e) {
+      const emojiList = ["🥹", "🤬", "😡", "😠"];
+      const randomEmoji = emojiList[Math.floor(Math.random() * emojiList.length)];
+      const emojiElem = document.createElement("div");
+      emojiElem.className = "emoji";
+      emojiElem.textContent = randomEmoji;
+      const posX = Math.random() * window.innerWidth;
+      const posY = Math.random() * window.innerHeight;
+      emojiElem.style.left = posX + "px";
+      emojiElem.style.top = posY + "px";
+      document.body.appendChild(emojiElem);
+      setTimeout(() => {
+        emojiElem.style.opacity = 0;
+        emojiElem.style.transform = "translateY(-50px)";
+      }, 50);
+      setTimeout(() => emojiElem.remove(), 1500);
+    }
+
+    // Updated romanticAnimation: hearts appear randomly across the entire screen
+    function romanticAnimation() {
+      for (let i = 0; i < 20; i++) {
+        const heart = document.createElement("div");
+        heart.className = "romantic-heart";
+        heart.textContent = "❤️";
+        const posX = Math.random() * window.innerWidth;
+        const posY = Math.random() * window.innerHeight;
+        heart.style.left = posX + "px";
+        heart.style.top = posY + "px";
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 3000);
+      }
+    }
+
+    function moveButton(e) {
+      createRipple(e, noButton);
+      showEmoji(e);
+      noButton.classList.add('clicked');
+      setTimeout(() => noButton.classList.remove('clicked'), 150);
+      
+      const x = Math.random() * 200 - 100;
+      const y = Math.random() * 100 - 50;
+      noButton.style.transform = `translate(${x}px, ${y}px)`;
+      noButton.textContent = messages[Math.floor(Math.random() * messages.length)];
+      
+      yesScale += 0.05;
+      document.getElementById('yesButton').style.transform = `scale(${yesScale})`;
+    }
+
+    function showResponse(e) {
+      const yesButton = document.getElementById('yesButton');
+      createRipple(e, yesButton);
+      yesButton.classList.add('clicked');
+      setTimeout(() => yesButton.classList.remove('clicked'), 150);
+      
+      // Trigger romantic hearts animation
+      romanticAnimation();
+      
+      setTimeout(() => {
+        document.querySelector('.buttons').style.display = 'none';
+        document.querySelector('.message').style.display = 'none';
+        document.getElementById('response').style.display = 'block';
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
+
